@@ -11,7 +11,8 @@ import (
 	"time"
 
 	"github.com/Azure/go-ntlmssp"
-	"github.com/hashicorp/mdns"
+
+	"github.com/micrictor/mdns"
 )
 
 func main() {
@@ -32,18 +33,18 @@ func main() {
 	fmt.Printf("Querying for %s every %d minutes +- %d seconds, feeding a false credential for %s.\n", queryName, interval, intervalDeviation, userName)
 
 	for {
-		resultChan := make(chan *mdns.ServiceEntry, 4)
+		resultChan := make(chan *mdns.ServiceEntry, 1)
 
-		err := mdns.Lookup(queryName, resultChan)
-		if err != nil {
-			// log.Fatal(err)
-		}
-		close(resultChan)
-		lookupResult := <-resultChan
+		defer close(resultChan)
+		mdns.Lookup(queryName, resultChan)
 
-		if lookupResult != nil && lookupResult.AddrV4 != nil {
-			doAuth(strings.ToLower(authMethod), userName, lookupResult.AddrV4, queryName)
-		}
+		go func() {
+			for entry := range resultChan {
+				if entry.AddrV4 != nil {
+					doAuth(strings.ToLower(authMethod), userName, entry.AddrV4, queryName)
+				}
+			}
+		}()
 
 		deviation := rand.Intn(intervalDeviation)
 		time.Sleep(time.Duration(interval)*time.Minute + time.Duration(deviation)*time.Second)
