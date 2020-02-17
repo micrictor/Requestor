@@ -75,7 +75,7 @@ func doAuth(authMethod string, userName string, ipAddr net.IP, hostName string) 
 
 		req, _ := http.NewRequest("GET", "http://"+ipAddr.String(), nil)
 		req.SetBasicAuth(userName, password)
-		req.Header.Set("UserAgent", "WinHttp-Autoproxy-Service/5.1")
+		req.Header.Set("User-Agent", "WinHttp-Autoproxy-Service/5.1")
 		req.Host = hostName + ".local"
 
 		_, err := client.Do(req)
@@ -93,7 +93,7 @@ func doAuth(authMethod string, userName string, ipAddr net.IP, hostName string) 
 
 		req, _ := http.NewRequest("GET", "http://"+ipAddr.String(), nil)
 		req.SetBasicAuth(userName, password)
-		req.Header.Set("UserAgent", "WinHttp-Autoproxy-Service/5.1")
+		req.Header.Set("User-Agent", "WinHttp-Autoproxy-Service/5.1")
 		req.Host = hostName + ".local"
 
 		_, err := client.Do(req)
